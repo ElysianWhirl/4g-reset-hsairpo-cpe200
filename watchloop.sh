@@ -1,12 +1,14 @@
 #!/bin/ash
 
 # Define the target hosts to ping
-target1="104.18.214.235"
-target2="ava.game.naver.com"
-target3="104.17.3.81"
+target1="target1"
+target2="target2"
+target3="target3"
 
 # Define the interval between pings in seconds
 interval=1
+timeout=1
+count=1
 
 # Consecutive failed
 consecutive_failed=3
@@ -31,7 +33,7 @@ do
         all_failed=1
 
         # Perform ping for target 1
-        ping_result=$(ping -c 1 -W 1 $target1 2>/dev/null)
+        ping_result=$(ping -c $count -W $timeout $target1 2>/dev/null)
         if [ $? -eq 0 ]; then
             response_time=$(echo "$ping_result" | awk -F'=' '/time=/ {print $4}' | cut -d " " -f 1)
             echo "$current_time - USB0 IP: $usb0_ip: Ping to $target1 OK (Response time: $response_time ms)"
@@ -43,7 +45,7 @@ do
         fi
 
         # Perform ping for target 2
-        ping_result=$(ping -c 1 -W 1 $target2 2>/dev/null)
+        ping_result=$(ping -c $count -W $timeout $target2 2>/dev/null)
         if [ $? -eq 0 ]; then
             response_time=$(echo "$ping_result" | awk -F'=' '/time=/ {print $4}' | cut -d " " -f 1)
             echo "$current_time - USB0 IP: $usb0_ip: Ping to $target2 OK (Response time: $response_time ms)"
@@ -55,7 +57,7 @@ do
         fi
 
         # Perform ping for target 3
-        ping_result=$(ping -c 1 -W 1 $target3 2>/dev/null)
+        ping_result=$(ping -c $count -W $timeout $target3 2>/dev/null)
         if [ $? -eq 0 ]; then
             response_time=$(echo "$ping_result" | awk -F'=' '/time=/ {print $4}' | cut -d " " -f 1)
             echo "$current_time - USB0 IP: $usb0_ip: Ping to $target3 OK (Response time: $response_time ms)"
@@ -69,7 +71,7 @@ do
         # Check if all targets encountered consecutive failed pings
         if [ $all_failed -eq 1 ] && [ $failed_count_target1 -ge $consecutive_failed ] && [ $failed_count_target2 -ge $consecutive_failed ] && [ $failed_count_target3 -ge $consecutive_failed ]; then
             echo "$current_time - USB0 IP: $usb0_ip: All targets encountered $consecutive_failed consecutive failed pings. Running activate_airplane.sh..."
-            /root/activate_airplane.sh && echo "$current_time - USB0 IP: $usb0_ip: activate_airplane.sh executed successfully" || echo "$current_time - USB0 IP: $usb0_ip: activate_airplane.sh execution failed"
+            /root/airplane.sh && echo "$current_time - USB0 IP: $usb0_ip: activate_airplane.sh executed successfully" || echo "$current_time - USB0 IP: $usb0_ip: activate_airplane.sh execution failed"
             echo "$current_time - USB0 IP: $usb0_ip: Waiting for USB0 IP before resuming pinging..."
             failed_count_target1=0
             failed_count_target2=0
