@@ -1,10 +1,16 @@
 #!/bin/sh
 
-#ifdown 4g
-ifdown 4g
+IFACE="${1:-4g}"
+DEVICE=$(uci -q get network.${IFACE}.cdevice)
+VENDOR=$(uci -q get network.${IFACE}.vendor)
+
+. /usr/lib/4g/${VENDOR}.sh
+
 killall quectel-cm 2>/dev/null
 killall 4gstat.sh 2>/dev/null
 killall 4gup.sh 2>/dev/null
+ifdown "$IFACE" >/dev/null
+ubus call network.gcom del_device "{\"name\":\"$DEVICE\"}"
 rm -rf /var/run/${IFACE}/running
 rm -rf /var/run/${IFACE}/netreg
 rm -rf /var/run/${IFACE}/simcheck
